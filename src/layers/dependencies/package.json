@@ -1,0 +1,14 @@
+{
+  "name": "books-service-dependencies",
+  "version": "1.0.0",
+  "description": "Book service dependency layer",
+  "main": "app.js",
+  "author": "jquirossoto",
+  "license": "ISC",
+  "dependencies": {
+    "@middy/do-not-wait-for-empty-event-loop": "^2.5.7",
+    "aws-sdk": "^2.1073.0",
+    "middy": "^0.36.0",
+    "uuid": "^8.3.2"
+  }
+}

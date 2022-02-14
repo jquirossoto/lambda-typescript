@@ -1,0 +1,14 @@
+{
+    "TableName": "Books",
+    "AttributeDefinitions": [
+        {
+            "AttributeName": "bookId",
+            "AttributeType": "S"
+        }
+    ],
+    "KeySchema": [{
+        "AttributeName": "bookId",
+        "KeyType": "HASH"
+    }],
+    "BillingMode": "PAY_PER_REQUEST"
+}

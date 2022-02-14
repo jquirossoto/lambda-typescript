@@ -1,0 +1,94 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: ''
+
+################################### APPLICATION PARAMETERS ###################################
+
+################################### APPLICATION CONDITIONS ###################################
+
+################################### GLOBAL DEFINITIONS ###################################
+
+Globals:
+  Function:
+    Runtime: nodejs14.x
+    Timeout: 30
+
+################################### APPLICATION RESOURCES ###################################
+
+Resources:
+
+  API:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: BookService
+      Description: BookService
+      StageName: 'dev'
+      TracingEnabled: true
+      EndpointConfiguration: 
+        Type: EDGE # Set REGIONAL for custom CloudFront distribution
+
+  DependencyLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: BookServiceDependencyLayer
+      Description: ''
+      ContentUri: src/layers/dependencies
+      CompatibleRuntimes:
+        - nodejs14.x
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: nodejs14.x
+
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: BookServiceCommonLayer
+      Description: ''
+      ContentUri: dist/layers/common
+      CompatibleRuntimes:
+        - nodejs14.x
+      RetentionPolicy: Retain
+    Metadata:
+      BuildMethod: nodejs14.x
+
+  CreateFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: books-service-create
+      CodeUri: dist/handlers/create
+      Handler: app.handler
+      Layers:
+        - !Ref DependencyLayer
+        - !Ref CommonLayer
+      Events:
+        CreateAccountsEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: post
+            RestApiId: !Ref API
+
+  GetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: books-service-get
+      CodeUri: dist/handlers/get
+      Handler: app.handler
+      Layers:
+        - !Ref DependencyLayer
+        - !Ref CommonLayer
+      Events:
+        CreateAccountsEvent:
+          Type: Api
+          Properties:
+            Path: /{id}
+            Method: get
+            RestApiId: !Ref API
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      Fn::Transform:
+        Name: AWS::Include
+        Parameters:
+          Location: books.schema.json
