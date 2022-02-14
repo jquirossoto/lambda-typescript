@@ -17,6 +17,14 @@ Globals:
 
 Resources:
 
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      Fn::Transform:
+        Name: AWS::Include
+        Parameters:
+          Location: books.schema.json
+
   API:
     Type: AWS::Serverless::Api
     Properties:
@@ -60,8 +68,11 @@ Resources:
       Layers:
         - !Ref DependencyLayer
         - !Ref CommonLayer
+      Policies:
+        - DynamoDBCrudPolicy:
+          TableName: !Ref DynamoDBTable
       Events:
-        CreateAccountsEvent:
+        CreateBooksEvent:
           Type: Api
           Properties:
             Path: /
@@ -77,18 +88,13 @@ Resources:
       Layers:
         - !Ref DependencyLayer
         - !Ref CommonLayer
+      Policies:
+        - DynamoDBCrudPolicy:
+          TableName: !Ref DynamoDBTable
       Events:
-        CreateAccountsEvent:
+        GetBooksEvent:
           Type: Api
           Properties:
             Path: /{id}
             Method: get
             RestApiId: !Ref API
-
-  DynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      Fn::Transform:
-        Name: AWS::Include
-        Parameters:
-          Location: books.schema.json

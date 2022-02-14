@@ -6,7 +6,6 @@ import AWS from 'aws-sdk';
 import { BookRepository } from '/opt/nodejs/book.repository';
 
 let dynamodb = new AWS.DynamoDB.DocumentClient({
-  endpoint: new AWS.Endpoint('http://dynamodb:8000'),
   region: 'us-east-1'
 });
 

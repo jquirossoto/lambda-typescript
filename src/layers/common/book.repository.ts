@@ -13,7 +13,7 @@ export class BookRepository {
   create = async (book: Book): Promise<Book> => {
     return new Promise((resolve, reject) => {
       const params = {
-        TableName: 'books',
+        TableName: 'Books',
         Key: { bookId: uuid() },
         UpdateExpression: `set title = :t, genre = :g, author = :a`,
         ExpressionAttributeValues: {
@@ -47,7 +47,7 @@ export class BookRepository {
         Key: {
           bookId: id
         },
-        TableName: 'books'
+        TableName: 'Books'
       };
       this.dynamodb
         .get(params)
