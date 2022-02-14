@@ -20,6 +20,6 @@
   "exclude": [
     "node_modules",
     "src/layers/dependencies/nodejs/node_modules",
-    "**/*.spec.ts"
+    "src/**/*.spec.ts"
   ]
 }
