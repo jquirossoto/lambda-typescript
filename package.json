@@ -8,13 +8,12 @@
     "prestart": "npm run build",
     "start": "sam local start-api --docker-network books-service_book-service-network",
     "prebuild": "npm run build:clean",
-    "build": "tsc",
-    "build:clean": "rm -rf dist",
+    "build": "tsc && sam build",
+    "build:clean": "rm -rf dist && rm -rf .aws-sam",
     "test": "echo \"Error: no test specified\" && exit 1",
     "docker:up": "docker-compose -f ./docker-compose.yml up -d",
     "docker:down": "docker-compose kill",
-    "docker:dynamodb:init": "aws dynamodb create-table --cli-input-json file://books.schema.json --endpoint-url http://localhost:8000",
-    "sam:build": "npm run build && sam build"
+    "docker:dynamodb:init": "aws dynamodb create-table --cli-input-json file://books.schema.json --endpoint-url http://localhost:8000"
   },
   "author": "jquirossoto",
   "license": "ISC",

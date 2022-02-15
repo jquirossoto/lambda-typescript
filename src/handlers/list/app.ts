@@ -11,8 +11,8 @@ import Errors from '/opt/nodejs/errors.enum';
 import { buildSuccessReponse } from '/opt/nodejs/api.utils';
 
 export const handler: Handler = middy(async (event: APIGatewayEvent, context: Context, callback: Callback) => {
-    const book: Book = await BookRepository.get(event.pathParameters['id']);
-    return buildSuccessReponse(book);
+    const books: Book[] = await BookRepository.list();
+    return buildSuccessReponse(books);
 }).use([
     doNotWaitForEmptyEventLoop(),
     httpErrorHandler({ fallbackMessage: Errors.GENERAL_ERROR }),
