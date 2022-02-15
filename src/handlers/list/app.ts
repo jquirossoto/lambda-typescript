@@ -6,9 +6,9 @@ import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
 import middy from '@middy/core';
 
 import BookRepository from '/opt/nodejs/repositories/book.repository';
-import Book from '../../layers/common/definitions/book.interface';
-import Errors from '../../layers/common/definitions/errors.enum';
-import { buildSuccessReponse } from '../../layers/common/utils/api.utils';
+import Book from '/opt/nodejs/definitions/book.interface';
+import { buildSuccessReponse } from '/opt/nodejs/utils/api.utils';
+import Errors from '/opt/nodejs/definitions/errors.enum';
 
 export const handler: Handler = middy(async (event: APIGatewayEvent, context: Context, callback: Callback) => {
     const books: Book[] = await BookRepository.list();

@@ -6,8 +6,8 @@ import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
 import middy from '@middy/core';
 
 import BookRepository from '/opt/nodejs/repositories/book.repository';
-import { buildSuccessReponse } from '../../layers/common/utils/api.utils';
-import Errors from '../../layers/common/definitions/errors.enum';
+import { buildSuccessReponse } from '/opt/nodejs/utils/api.utils';
+import Errors from '/opt/nodejs/definitions/errors.enum';
 
 export const handler: Handler = middy(async (event: APIGatewayEvent, context: Context, callback: Callback) => {
     await BookRepository.delete(event.pathParameters.id);

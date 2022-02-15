@@ -1,8 +1,7 @@
-import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
-import BaseRepository from './base.repository';
 
+import BaseRepository from './base.repository';
 import Book from '../definitions/book.interface';
 
 export default class BookRepository extends BaseRepository<Book> {
@@ -80,7 +79,7 @@ export default class BookRepository extends BaseRepository<Book> {
                     items.Items.forEach((item) => scanResults.push(item));
                     params.ExclusiveStartKey = items.LastEvaluatedKey;
                 } while (typeof items.LastEvaluatedKey !== 'undefined');
-                const books: Book[] = scanResults.map((item) => {
+                const books: Book[] = scanResults.map((item: DocumentClient.AttributeMap) => {
                     const book: Book = {
                         id: item.bookId,
                         title: item.title,
