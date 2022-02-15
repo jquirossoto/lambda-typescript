@@ -6,10 +6,8 @@ import { Callback, Context, Handler } from 'aws-lambda';
 import middy from '@middy/core';
 
 import BookRepository from '/opt/nodejs/repositories/book.repository';
-import { CustomAPIGatewayEvent } from '/opt/nodejs/definitions/custom-gateway-event.alias';
-import Book from '/opt/nodejs/definitions/book.interface';
 import { buildSuccessReponse } from '/opt/nodejs/utils/api.utils';
-import Errors from '/opt/nodejs/definitions/errors.enum';
+import { Book, CustomAPIGatewayEvent, Errors } from '/opt/nodejs/utils/definitions';
 
 export const handler: Handler = middy(
     async (event: CustomAPIGatewayEvent<Book>, context: Context, callback: Callback) => {

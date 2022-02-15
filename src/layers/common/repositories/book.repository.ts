@@ -1,14 +1,16 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
 
+import { Book } from '../utils/definitions';
 import BaseRepository from './base.repository';
-import Book from '../definitions/book.interface';
+
+const TABLE_NAME = 'Books';
 
 export default class BookRepository extends BaseRepository<Book> {
     static create = (book: Book): Promise<Book> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.UpdateItemInput = {
-                TableName: 'Books',
+                TableName: TABLE_NAME,
                 Key: { bookId: uuid() },
                 UpdateExpression: `set title = :t, genre = :g, author = :a`,
                 ExpressionAttributeValues: {
@@ -36,13 +38,13 @@ export default class BookRepository extends BaseRepository<Book> {
         });
     };
 
-    static get = (id: string): Promise<Book> => {
+    static findOne = (id: string): Promise<Book> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.GetItemInput = {
                 Key: {
                     bookId: id
                 },
-                TableName: 'Books'
+                TableName: TABLE_NAME
             };
             this.dynamodb
                 .get(params)
@@ -65,11 +67,11 @@ export default class BookRepository extends BaseRepository<Book> {
         });
     };
 
-    static list = (): Promise<Book[]> => {
+    static find = (): Promise<Book[]> => {
         return new Promise(async (resolve, reject) => {
             try {
                 const params: DocumentClient.ScanInput = {
-                    TableName: 'Books',
+                    TableName: TABLE_NAME,
                     ExclusiveStartKey: undefined
                 };
                 const scanResults: DocumentClient.ItemList = [];
@@ -98,7 +100,7 @@ export default class BookRepository extends BaseRepository<Book> {
     static update = (id: string, book: Book): Promise<Book> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.UpdateItemInput = {
-                TableName: 'Books',
+                TableName: TABLE_NAME,
                 Key: { bookId: id },
                 UpdateExpression: `set title = :t, genre = :g, author = :a`,
                 ExpressionAttributeValues: {
@@ -129,7 +131,7 @@ export default class BookRepository extends BaseRepository<Book> {
     static delete = (id: string): Promise<null> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.DeleteItemInput = {
-                TableName: 'Books',
+                TableName: TABLE_NAME,
                 Key: { bookId: id }
             };
             this.dynamodb
