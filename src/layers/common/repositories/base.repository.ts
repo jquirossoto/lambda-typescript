@@ -10,16 +10,20 @@ export default abstract class BaseRepository<T> {
     create(item: T): Promise<T> {
         throw new Error('Method not implemented.');
     }
+
     update(id: string, item: T): Promise<T> {
         throw new Error('Method not implemented.');
     }
-    delete(id: string): Promise<T> {
+
+    delete(id: string): Promise<null> {
         throw new Error('Method not implemented.');
     }
-    get(id: string): Promise<T[]> {
+
+    findOne(id: string): Promise<T[]> {
         throw new Error('Method not implemented.');
     }
-    list(): Promise<T> {
+
+    find(): Promise<T> {
         throw new Error('Method not implemented.');
     }
 }
