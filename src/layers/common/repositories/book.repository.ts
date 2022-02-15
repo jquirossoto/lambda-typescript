@@ -3,7 +3,7 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
 import BaseRepository from './base.repository';
 
-import Book from './book.interface';
+import Book from '../definitions/book.interface';
 
 export default class BookRepository extends BaseRepository<Book> {
     static create = (book: Book): Promise<Book> => {
