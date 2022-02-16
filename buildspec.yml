@@ -12,7 +12,7 @@ phases:
             - npm run test
     post_build:
         commands:
-            - aws cloudformation package --template-file template.yaml --s3-bucket <bucket-here> --output-template-file packaged.yaml
+            - aws cloudformation package --template-file template.yaml --s3-bucket book-service-packages-ckzq3rnp2000009jwao6ofus8 --output-template-file packaged.yaml
 artifacts:
     type: zip
     files:
