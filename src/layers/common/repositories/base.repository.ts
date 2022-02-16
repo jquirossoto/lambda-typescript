@@ -3,7 +3,6 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
 export default abstract class BaseRepository<T> {
     static dynamodb: DocumentClient = new AWS.DynamoDB.DocumentClient({
-        endpoint: new AWS.Endpoint('http://dynamodb:8000'),
         region: 'us-east-1'
     });
 
