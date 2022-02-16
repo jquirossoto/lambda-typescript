@@ -9,152 +9,155 @@ Description: ''
 ################################### GLOBAL DEFINITIONS ###################################
 
 Globals:
-  Function:
-    Runtime: nodejs14.x
-    Timeout: 30
+    Function:
+        Runtime: nodejs14.x
+        Timeout: 30
 
 ################################### APPLICATION RESOURCES ###################################
 
 Resources:
+    DynamoDBTable:
+        Type: AWS::DynamoDB::Table
+        Properties:
+            TableName: Books
+            AttributeDefinitions:
+                - AttributeName: bookId
+                  AttributeType: S
+            KeySchema:
+                - AttributeName: bookId
+                  KeyType: HASH
+            BillingMode: PAY_PER_REQUEST
 
-  DynamoDBTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      Fn::Transform:
-        Name: AWS::Include
-        Parameters:
-          Location: books.schema.json
+    API:
+        Type: AWS::Serverless::Api
+        Properties:
+            Name: BookService
+            Description: BookService
+            StageName: 'dev'
+            TracingEnabled: true
+            EndpointConfiguration:
+                Type: EDGE # Set REGIONAL for custom CloudFront distribution
 
-  API:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: BookService
-      Description: BookService
-      StageName: 'dev'
-      TracingEnabled: true
-      EndpointConfiguration: 
-        Type: EDGE # Set REGIONAL for custom CloudFront distribution
+    DependencyLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: BookServiceDependencyLayer
+            Description: ''
+            ContentUri: src/layers/dependencies
+            CompatibleRuntimes:
+                - nodejs14.x
+            RetentionPolicy: Retain
+        Metadata:
+            BuildMethod: nodejs14.x
 
-  DependencyLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: BookServiceDependencyLayer
-      Description: ''
-      ContentUri: src/layers/dependencies
-      CompatibleRuntimes:
-        - nodejs14.x
-      RetentionPolicy: Retain
-    Metadata:
-      BuildMethod: nodejs14.x
+    CommonLayer:
+        Type: AWS::Serverless::LayerVersion
+        Properties:
+            LayerName: BookServiceCommonLayer
+            Description: ''
+            ContentUri: dist/layers/common
+            CompatibleRuntimes:
+                - nodejs14.x
+            RetentionPolicy: Retain
+        Metadata:
+            BuildMethod: nodejs14.x
 
-  CommonLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: BookServiceCommonLayer
-      Description: ''
-      ContentUri: dist/layers/common
-      CompatibleRuntimes:
-        - nodejs14.x
-      RetentionPolicy: Retain
-    Metadata:
-      BuildMethod: nodejs14.x
+    CreateFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: books-service-create
+            CodeUri: dist/handlers/create
+            Handler: app.handler
+            Layers:
+                - !Ref DependencyLayer
+                - !Ref CommonLayer
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref DynamoDBTable
+            Events:
+                CreateBooksEvent:
+                    Type: Api
+                    Properties:
+                        Path: /
+                        Method: post
+                        RestApiId: !Ref API
 
-  CreateFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: books-service-create
-      CodeUri: dist/handlers/create
-      Handler: app.handler
-      Layers:
-        - !Ref DependencyLayer
-        - !Ref CommonLayer
-      Policies:
-        - DynamoDBCrudPolicy:
-          TableName: !Ref DynamoDBTable
-      Events:
-        CreateBooksEvent:
-          Type: Api
-          Properties:
-            Path: /
-            Method: post
-            RestApiId: !Ref API
+    GetFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: books-service-get
+            CodeUri: dist/handlers/get
+            Handler: app.handler
+            Layers:
+                - !Ref DependencyLayer
+                - !Ref CommonLayer
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref DynamoDBTable
+            Events:
+                GetBooksEvent:
+                    Type: Api
+                    Properties:
+                        Path: /{id}
+                        Method: get
+                        RestApiId: !Ref API
 
-  GetFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: books-service-get
-      CodeUri: dist/handlers/get
-      Handler: app.handler
-      Layers:
-        - !Ref DependencyLayer
-        - !Ref CommonLayer
-      Policies:
-        - DynamoDBCrudPolicy:
-          TableName: !Ref DynamoDBTable
-      Events:
-        GetBooksEvent:
-          Type: Api
-          Properties:
-            Path: /{id}
-            Method: get
-            RestApiId: !Ref API
+    ListFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: books-service-list
+            CodeUri: dist/handlers/list
+            Handler: app.handler
+            Layers:
+                - !Ref DependencyLayer
+                - !Ref CommonLayer
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref DynamoDBTable
+            Events:
+                ListBooksEvent:
+                    Type: Api
+                    Properties:
+                        Path: /
+                        Method: get
+                        RestApiId: !Ref API
 
-  ListFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: books-service-list
-      CodeUri: dist/handlers/list
-      Handler: app.handler
-      Layers:
-        - !Ref DependencyLayer
-        - !Ref CommonLayer
-      Policies:
-        - DynamoDBCrudPolicy:
-          TableName: !Ref DynamoDBTable
-      Events:
-        ListBooksEvent:
-          Type: Api
-          Properties:
-            Path: /
-            Method: get
-            RestApiId: !Ref API
+    UpdateFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: books-service-update
+            CodeUri: dist/handlers/update
+            Handler: app.handler
+            Layers:
+                - !Ref DependencyLayer
+                - !Ref CommonLayer
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref DynamoDBTable
+            Events:
+                UpdatedBooksEvent:
+                    Type: Api
+                    Properties:
+                        Path: /{id}
+                        Method: put
+                        RestApiId: !Ref API
 
-  UpdateFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: books-service-update
-      CodeUri: dist/handlers/update
-      Handler: app.handler
-      Layers:
-        - !Ref DependencyLayer
-        - !Ref CommonLayer
-      Policies:
-        - DynamoDBCrudPolicy:
-          TableName: !Ref DynamoDBTable
-      Events:
-        UpdatedBooksEvent:
-          Type: Api
-          Properties:
-            Path: /{id}
-            Method: put
-            RestApiId: !Ref API
-
-  DeleteFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: books-service-delete
-      CodeUri: dist/handlers/delete
-      Handler: app.handler
-      Layers:
-        - !Ref DependencyLayer
-        - !Ref CommonLayer
-      Policies:
-        - DynamoDBCrudPolicy:
-          TableName: !Ref DynamoDBTable
-      Events:
-        DeleteBooksEvent:
-          Type: Api
-          Properties:
-            Path: /{id}
-            Method: delete
-            RestApiId: !Ref API
+    DeleteFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+            FunctionName: books-service-delete
+            CodeUri: dist/handlers/delete
+            Handler: app.handler
+            Layers:
+                - !Ref DependencyLayer
+                - !Ref CommonLayer
+            Policies:
+                - DynamoDBCrudPolicy:
+                      TableName: !Ref DynamoDBTable
+            Events:
+                DeleteBooksEvent:
+                    Type: Api
+                    Properties:
+                        Path: /{id}
+                        Method: delete
+                        RestApiId: !Ref API
