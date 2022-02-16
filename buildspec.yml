@@ -14,20 +14,19 @@ phases:
         commands:
             - aws cloudformation package --template-file template.yaml --s3-bucket book-service-packages-ckzq3rnp2000009jwao6ofus8 --output-template-file packaged.yaml
 artifacts:
-    type: zip
     files:
         - template.yaml
         - packaged.yaml
-reports:
-    clover:
-        files:
-            - clover.xml
-        base-directory: jest/coverage
-        discard-paths: false
-        file-format: CLOVERXML
-    junit:
-        files:
-            - junit.xml
-        base-directory: jest/junit
-        discard-paths: false
-        file-format: JUNITXML
+# reports:
+#     clover:
+#         files:
+#             - clover.xml
+#         base-directory: jest/coverage
+#         discard-paths: false
+#         file-format: CLOVERXML
+#     junit:
+#         files:
+#             - junit.xml
+#         base-directory: jest/junit
+#         discard-paths: false
+#         file-format: JUNITXML
