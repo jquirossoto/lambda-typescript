@@ -1,0 +1,33 @@
+version: 0.2
+phases:
+    install:
+        runtime-versions:
+            nodejs: 12
+    pre_build:
+        commands:
+            - npm ci
+    build:
+        commands:
+            - npm run build
+            - npm run test
+    post_build:
+        commands:
+            - aws cloudformation package --template-file template.yaml --s3-bucket <bucket-here> --output-template-file packaged.yaml
+artifacts:
+    type: zip
+    files:
+        - template.yaml
+        - packaged.yaml
+reports:
+    clover:
+        files:
+            - clover.xml
+        base-directory: jest/coverage
+        discard-paths: false
+        file-format: CLOVERXML
+    junit:
+        files:
+            - junit.xml
+        base-directory: jest/junit
+        discard-paths: false
+        file-format: JUNITXML
