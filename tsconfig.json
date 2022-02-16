@@ -1,25 +1,21 @@
 {
-  "extends": "@tsconfig/node14/tsconfig.json",
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "noImplicitReturns": true,
-    "strict": false,
-    "sourceMap": false,
-    "outDir": "dist",
-    "module": "commonjs",
-    "target": "es2019",
-    "moduleResolution": "node",
-    "typeRoots": ["./node_modules/@types"],
-    "baseUrl": ".",
-    "paths": {
-      "*": [ "src/layers/dependencies/node_modules/*" ],
-      "/opt/nodejs/*": [ "src/layers/common/*" ]
-    }
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "src/layers/dependencies/nodejs/node_modules",
-    "src/**/*.spec.ts"
-  ]
+    "extends": "@tsconfig/node14/tsconfig.json",
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "noImplicitReturns": true,
+        "strict": false,
+        "sourceMap": false,
+        "outDir": "dist",
+        "module": "commonjs",
+        "target": "es2019",
+        "moduleResolution": "node",
+        "typeRoots": ["./node_modules/@types"],
+        "baseUrl": ".",
+        "paths": {
+            "*": ["src/layers/dependencies/node14/node_modules/*"],
+            "/opt/nodejs/*": ["src/layers/common/*"]
+        }
+    },
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules", "src/layers/dependencies/node14/node_modules", "src/**/*.spec.ts"]
 }
