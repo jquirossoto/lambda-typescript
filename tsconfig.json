@@ -6,8 +6,6 @@
         "strict": false,
         "sourceMap": false,
         "outDir": "dist",
-        "module": "commonjs",
-        "target": "es2019",
         "moduleResolution": "node",
         "typeRoots": ["./node_modules/@types"],
         "baseUrl": ".",
