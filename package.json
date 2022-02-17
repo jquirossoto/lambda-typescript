@@ -5,7 +5,7 @@
     "main": "app.js",
     "scripts": {
         "prepare": "husky install",
-        "postinstall": "cd src/layers/dependencies && npm install",
+        "postinstall": "cd src/layers/dependencies/node14 && npm ci",
         "prestart": "npm run build",
         "start": "sam local start-api --docker-network books-service_book-service-network",
         "prebuild": "npm run build:clean",
@@ -14,7 +14,9 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "docker:up": "docker-compose -f ./docker-compose.yml up -d",
         "docker:down": "docker-compose kill",
-        "docker:dynamodb:init": "aws dynamodb create-table --cli-input-json file://books.schema.json --endpoint-url http://localhost:8000"
+        "docker:dynamodb:init": "aws dynamodb create-table --cli-input-json file://books.schema.json --endpoint-url http://localhost:8000",
+        "cf:stack:deploy": "aws cloudformation deploy --template-file ./cloudformation.yaml --stack-name book-service-cicd --capabilities CAPABILITY_NAMED_IAM --parameter-overrides $(cat .env)",
+        "cf:template:validate": "aws cloudformation validate-template --template-body file://cloudformation.yaml"
     },
     "author": "jquirossoto",
     "license": "ISC",
