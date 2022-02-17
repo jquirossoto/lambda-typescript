@@ -5,9 +5,9 @@ import httpResponseSerializer from '@middy/http-response-serializer';
 import { Callback, Context, Handler } from 'aws-lambda';
 import middy from '@middy/core';
 
-import BookRepository from '/opt/nodejs/repositories/book.repository';
-import { buildSuccessReponse } from '/opt/nodejs/utils/api.utils';
-import { Book, CustomAPIGatewayEvent, Errors } from '/opt/nodejs/utils/definitions';
+import BookRepository from '/opt/repositories/book.repository';
+import { buildSuccessReponse } from '/opt/utils/api.utils';
+import { Book, CustomAPIGatewayEvent, Errors } from '/opt/utils/definitions';
 
 export const handler: Handler = middy(
     async (event: CustomAPIGatewayEvent<Book>, context: Context, callback: Callback) => {
