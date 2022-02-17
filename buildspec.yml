@@ -9,8 +9,8 @@ phases:
             - npm ci --unsafe-perm
     build:
         commands:
-            - npm run build
             - npm run test
+            - npm run build
     post_build:
         commands:
             - aws cloudformation package --template-file template.yaml --s3-bucket book-service-packages-ckzq3rnp2000009jwao6ofus8 --output-template-file packaged.yaml
