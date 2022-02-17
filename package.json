@@ -10,7 +10,7 @@
         "start": "sam local start-api --docker-network books-service_book-service-network",
         "start:watch": "nodemon --watch \"dist/**\" --exec \"sam local start-api --docker-network books-service_book-service-network\"",
         "prebuild": "npm run build:clean",
-        "build": "tsc",
+        "build": "tsc --project tsconfig.build.json",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist",
         "test": "jest",
