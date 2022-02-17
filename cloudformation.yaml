@@ -1,0 +1,421 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: ''
+
+################################### APPLICATION PARAMETERS ###################################
+
+Parameters:
+    CodestarConnectionId:
+        Type: String
+        Description: Specify Codestar connection identifier that is configured and authenticated for the source provider.
+
+    FullRepositoryId:
+        Type: String
+        Description: 'Specify the owner and name of the repository where source changes are to be detected. Example: some-user/my-repo.'
+
+    BranchName:
+        Type: String
+        Description: Specify the name of the branch where source changes are to be detected.
+
+    ArtifactStoreS3Location:
+        Type: String
+        Description: Specify the name of the S3 bucket to store the CodePipeline artifacts.
+
+################################### APPLICATION MAPPINGS ###################################
+
+Mappings:
+    NameConfig:
+        CodeBuildProject:
+            Name: book-service
+        CodeBuildLogGroup:
+            Name: /aws/codebuild/book-service
+
+################################### APPLICATION RESOURCES ###################################
+
+Resources:
+    ################################### S3 ###################################
+
+    BookServicePackagesBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub book-service-packages-ckzq3rnp2000009jwao6ofus8
+
+    ################################### CODE BUILD ###################################
+
+    CodeBuildRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: BookService-CodeBuildRole
+            Description: BookService-CodeBuildRole
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: codebuild.amazonaws.com
+                      Action: sts:AssumeRole
+
+    CodeBuildBasePolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: BookService-CodeBuildBasePolicy
+            Roles:
+                - !Ref CodeBuildRole
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Resource:
+                          - !Join [
+                                '',
+                                [
+                                    !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/',
+                                    !FindInMap [NameConfig, CodeBuildProject, Name]
+                                ]
+                            ]
+                          - !Join [
+                                '',
+                                [
+                                    !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/',
+                                    !FindInMap [NameConfig, CodeBuildProject, Name],
+                                    ':*'
+                                ]
+                            ]
+                      Action:
+                          - logs:CreateLogGroup
+                          - logs:CreateLogStream
+                          - logs:PutLogEvents
+                    - Effect: Allow
+                      Resource:
+                          - !Sub arn:aws:s3:::codepipeline-${AWS::Region}-*
+                      Action:
+                          - s3:PutObject
+                          - s3:GetObject
+                          - s3:GetObjectVersion
+                          - s3:GetBucketAcl
+                          - s3:GetBucketLocation
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - s3:*
+                    - Effect: Allow
+                      Resource:
+                          - !Join [
+                                '',
+                                [
+                                    !Sub 'arn:aws:codebuild:${AWS::Region}:${AWS::AccountId}:report-group/',
+                                    !FindInMap [NameConfig, CodeBuildProject, Name],
+                                    '-*'
+                                ]
+                            ]
+                      Action:
+                          - codebuild:CreateReportGroup
+                          - codebuild:CreateReport
+                          - codebuild:UpdateReport
+                          - codebuild:BatchPutTestCases
+                          - codebuild:BatchPutCodeCoverages
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - ecr:BatchCheckLayerAvailability
+                          - ecr:InitiateLayerUpload
+                          - ecr:UploadLayerPart
+                          - ecr:CompleteLayerUpload
+                          - ecr:PutImage
+                          - ecr:GetAuthorizationToken
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - ec2:CreateNetworkInterface
+                          - ec2:DescribeDhcpOptions
+                          - ec2:DescribeNetworkInterfaces
+                          - ec2:DeleteNetworkInterface
+                          - ec2:DescribeSubnets
+                          - ec2:DescribeSecurityGroups
+                          - ec2:DescribeVpcs
+
+    CodeBuildCloudwatchPolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: BookService-CodeBuildCloudwatchPolicy
+            Roles:
+                - !Ref CodeBuildRole
+            PolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Resource:
+                          - !Join [
+                                '',
+                                [
+                                    !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:',
+                                    !FindInMap [NameConfig, CodeBuildLogGroup, Name]
+                                ]
+                            ]
+                          - !Join [
+                                '',
+                                [
+                                    !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:',
+                                    !FindInMap [NameConfig, CodeBuildLogGroup, Name],
+                                    ':*'
+                                ]
+                            ]
+                      Action:
+                          - logs:CreateLogGroup
+                          - logs:CreateLogStream
+                          - logs:PutLogEvents
+
+    CodeBuildProject:
+        Type: AWS::CodeBuild::Project
+        Properties:
+            Artifacts:
+                Type: CODEPIPELINE
+                EncryptionDisabled: false
+                Name: book-service
+                Packaging: NONE
+            Cache:
+                Type: NO_CACHE
+            BadgeEnabled: false
+            ConcurrentBuildLimit: 1
+            Description: pets api codebuild
+            Environment:
+                ComputeType: BUILD_GENERAL1_SMALL
+                Image: aws/codebuild/standard:5.0
+                ImagePullCredentialsType: CODEBUILD
+                PrivilegedMode: true
+                Type: LINUX_CONTAINER
+            LogsConfig:
+                CloudWatchLogs:
+                    GroupName: !FindInMap [NameConfig, CodeBuildLogGroup, Name]
+                    Status: ENABLED
+                    StreamName: book-service
+                S3Logs:
+                    Status: DISABLED
+            Name: !FindInMap [NameConfig, CodeBuildProject, Name]
+            QueuedTimeoutInMinutes: 480
+            ServiceRole: !GetAtt CodeBuildRole.Arn
+            Source:
+                Type: CODEPIPELINE
+            TimeoutInMinutes: 60
+
+    ################################### CODE PIPELINE ###################################
+
+    CodePipelineServiceRole:
+        Type: AWS::IAM::Role
+        Properties:
+            RoleName: BookService-CodePipelineServiceRole
+            Description: BookService-CodePipelineServiceRole
+            AssumeRolePolicyDocument:
+                Version: 2012-10-17
+                Statement:
+                    - Effect: Allow
+                      Principal:
+                          Service: codepipeline.amazonaws.com
+                      Action: sts:AssumeRole
+
+    CodePipelinePolicy:
+        Type: AWS::IAM::Policy
+        Properties:
+            PolicyName: BookService-CodePipelinePolicy
+            Roles:
+                - !Ref CodePipelineServiceRole
+            PolicyDocument:
+                Version: '2012-10-17'
+                Statement:
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - iam:PassRole
+                      Condition:
+                          StringEqualsIfExists:
+                              iam:PassedToService:
+                                  - cloudformation.amazonaws.com
+                                  - elasticbeanstalk.amazonaws.com
+                                  - ec2.amazonaws.com
+                                  - ecs-tasks.amazonaws.com
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - codecommit:CancelUploadArchive
+                          - codecommit:GetBranch
+                          - codecommit:GetCommit
+                          - codecommit:GetRepository
+                          - codecommit:GetUploadArchiveStatus
+                          - codecommit:UploadArchive
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - codedeploy:CreateDeployment
+                          - codedeploy:GetApplication
+                          - codedeploy:GetApplicationRevision
+                          - codedeploy:GetDeployment
+                          - codedeploy:GetDeploymentConfig
+                          - codedeploy:RegisterApplicationRevision
+                    - Effect: Allow
+                      Resource:
+                          - !Sub arn:aws:codestar-connections:${AWS::Region}:${AWS::AccountId}:connection/${CodestarConnectionId}
+                      Action:
+                          - codestar-connections:UseConnection
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - elasticbeanstalk:*
+                          - ec2:*
+                          - elasticloadbalancing:*
+                          - autoscaling:*
+                          - cloudwatch:*
+                          - s3:*
+                          - sns:*
+                          - cloudformation:*
+                          - rds:*
+                          - sqs:*
+                          - ecs:*
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - lambda:InvokeFunction
+                          - lambda:ListFunctions
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - opsworks:CreateDeployment
+                          - opsworks:DescribeApps
+                          - opsworks:DescribeCommands
+                          - opsworks:DescribeDeployments
+                          - opsworks:DescribeInstances
+                          - opsworks:DescribeStacks
+                          - opsworks:UpdateApp
+                          - opsworks:UpdateStack
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - cloudformation:CreateStack
+                          - cloudformation:DeleteStack
+                          - cloudformation:DescribeStacks
+                          - cloudformation:UpdateStack
+                          - cloudformation:CreateChangeSet
+                          - cloudformation:DeleteChangeSet
+                          - cloudformation:DescribeChangeSet
+                          - cloudformation:ExecuteChangeSet
+                          - cloudformation:SetStackPolicy
+                          - cloudformation:ValidateTemplate
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - codebuild:BatchGetBuilds
+                          - codebuild:StartBuild
+                          - codebuild:BatchGetBuildBatches
+                          - codebuild:StartBuildBatch
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - devicefarm:ListProjects
+                          - devicefarm:ListDevicePools
+                          - devicefarm:GetRun
+                          - devicefarm:GetUpload
+                          - devicefarm:CreateUpload
+                          - devicefarm:ScheduleRun
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - servicecatalog:ListProvisioningArtifacts
+                          - servicecatalog:CreateProvisioningArtifact
+                          - servicecatalog:DescribeProvisioningArtifact
+                          - servicecatalog:DeleteProvisioningArtifact
+                          - servicecatalog:UpdateProduct
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - cloudformation:ValidateTemplate
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - ecr:DescribeImages
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - states:DescribeExecution
+                          - states:DescribeStateMachine
+                          - states:StartExecution
+                    - Effect: Allow
+                      Resource: '*'
+                      Action:
+                          - appconfig:StartDeployment
+                          - appconfig:StopDeployment
+                          - appconfig:GetDeployment
+
+    CodePipeline:
+        Type: AWS::CodePipeline::Pipeline
+        Properties:
+            ArtifactStore:
+                Type: S3
+                # default location
+                Location: !Ref ArtifactStoreS3Location
+            Name: book-service-pipeline
+            RestartExecutionOnUpdate: false
+            RoleArn: !GetAtt CodePipelineServiceRole.Arn
+            Stages:
+                - Name: Source
+                  Actions:
+                      - Name: Source
+                        ActionTypeId:
+                            Category: Source
+                            Owner: AWS
+                            Provider: CodeStarSourceConnection
+                            Version: 1
+                        RunOrder: 1
+                        Configuration:
+                            ConnectionArn: !Sub arn:aws:codestar-connections:${AWS::Region}:${AWS::AccountId}:connection/${CodestarConnectionId}
+                            BranchName: !Ref BranchName
+                            OutputArtifactFormat: CODE_ZIP
+                            FullRepositoryId: !Ref FullRepositoryId
+                        Namespace: SourceVariables
+                        OutputArtifacts:
+                            - Name: SourceArtifact
+                        Region: !Ref AWS::Region
+                - Name: Build
+                  Actions:
+                      - Name: Build
+                        ActionTypeId:
+                            Category: Build
+                            Owner: AWS
+                            Provider: CodeBuild
+                            Version: 1
+                        RunOrder: 1
+                        Configuration:
+                            ProjectName: !Ref CodeBuildProject
+                        InputArtifacts:
+                            - Name: SourceArtifact
+                        Namespace: BuildVariables
+                        OutputArtifacts:
+                            - Name: BuildArtifact
+                        Region: !Ref AWS::Region
+                - Name: Deploy
+                  Actions:
+                      - Name: CreateChangeSet
+                        ActionTypeId:
+                            Category: Deploy
+                            Owner: AWS
+                            Provider: CloudFormation
+                            Version: '1'
+                        InputArtifacts:
+                            - Name: BuildArtifact
+                        Configuration:
+                            ActionMode: CHANGE_SET_REPLACE
+                            Capabilities: CAPABILITY_IAM,CAPABILITY_AUTO_EXPAND
+                            RoleArn: arn:aws:iam::186521841143:role/CloudFormationRole
+                            StackName: book-service
+                            TemplatePath: BuildArtifact::packaged.yaml
+                            ChangeSetName: book-service-deploy
+                        RunOrder: 1
+                      - Name: ExecuteChangeSet
+                        ActionTypeId:
+                            Category: Deploy
+                            Owner: AWS
+                            Provider: CloudFormation
+                            Version: '1'
+                        Configuration:
+                            ActionMode: CHANGE_SET_EXECUTE
+                            StackName: book-service
+                            ChangeSetName: book-service-deploy
+                        RunOrder: 2
+################################### APPLICATION OUTPUTS ###################################
