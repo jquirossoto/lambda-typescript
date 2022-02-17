@@ -5,7 +5,7 @@
     "main": "app.js",
     "scripts": {
         "prepare": "husky install",
-        "postinstall": "cd src/layers/dependencies/node14 && npm ci",
+        "postinstall": "cd src/layers/dependencies/nodejs && npm ci",
         "prestart": "npm run build",
         "start": "sam local start-api --docker-network books-service_book-service-network",
         "prebuild": "npm run build:clean",

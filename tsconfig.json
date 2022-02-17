@@ -12,10 +12,10 @@
         "typeRoots": ["./node_modules/@types"],
         "baseUrl": ".",
         "paths": {
-            "*": ["src/layers/dependencies/node14/node_modules/*"],
+            "*": ["src/layers/dependencies/nodejs/node_modules/*"],
             "/opt/nodejs/*": ["src/layers/common/*"]
         }
     },
     "include": ["src/**/*.ts"],
-    "exclude": ["node_modules", "src/layers/dependencies/node14/node_modules", "src/**/*.spec.ts"]
+    "exclude": ["node_modules", "src/layers/dependencies/nodejs/node_modules", "src/**/*.spec.ts"]
 }
