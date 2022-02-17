@@ -6,7 +6,9 @@ phases:
     pre_build:
         commands:
             - npm set-script prepare ""
-            - npm ci --unsafe-perm
+            - npm set-script postinstall ""
+            - npm ci
+            - cd src/layers/dependencies/nodejs && npm ci --production
     build:
         commands:
             - npm run test

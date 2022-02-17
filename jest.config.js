@@ -5,9 +5,9 @@ module.exports = {
     verbose: false,
     roots: ['<rootDir>/src'],
     transform: {
-        '^.+\\.(ts|tsx)$': 'ts-jest'
+        '^.+\\.(ts)$': 'ts-jest'
     },
-    testMatch: ['**/?(*.)+(spec|test).+(ts|tsx|js)'],
+    testMatch: ['**/?(*.)+(spec).+(ts)'],
     collectCoverageFrom: ['src/**/*.ts*'],
     coverageThreshold: {
         global: {

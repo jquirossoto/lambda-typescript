@@ -13,7 +13,7 @@
         "build": "tsc",
         "build:watch": "npm run build -- --watch",
         "build:clean": "rm -rf dist",
-        "test": "jest --coverage",
+        "test": "jest",
         "docker:up": "docker-compose up -d",
         "docker:down": "docker-compose kill",
         "docker:dynamodb:init": "aws dynamodb create-table --cli-input-json file://books.schema.json --endpoint-url http://localhost:8000",
