@@ -1,7 +1,9 @@
 {
-  "printWidth": 120,
-  "semi": true,
-  "singleQuote": true,
-  "trailingComma": "none",
-  "tabWidth": 4
+    "printWidth": 120,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "importOrder": ["<THIRD_PARTY_MODULES>", "^/opt/(.*)$", "^[./]"],
+    "importOrderSeparation": true
 }
