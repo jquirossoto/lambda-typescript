@@ -1,5 +1,5 @@
-import APIGatewayProxyResult from './definitions/api-gateway-proxy-result.interface';
 import APIGatewayResponse from './definitions/api-gateway-response.interface';
+import APIGatewayProxyResult from './definitions/api-gateway-result.interface';
 
 export const buildSuccessResponse = (result: any, statusCode: number = 200): APIGatewayProxyResult<any> => {
     const response: APIGatewayProxyResult<APIGatewayResponse<any>> = {

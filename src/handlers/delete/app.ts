@@ -7,7 +7,7 @@ import { Handler } from 'aws-lambda';
 
 import BookRepository from '/opt/book.repository';
 import APIGatewayEvent from '/opt/definitions/api-gateway-event.alias';
-import APIGatewayProxyResult from '/opt/definitions/api-gateway-proxy-result.interface';
+import APIGatewayProxyResult from '/opt/definitions/api-gateway-result.interface';
 import Book from '/opt/definitions/book.interface';
 import Errors from '/opt/definitions/errors.enum';
 import { buildSuccessResponse, httpResponseSerializerOptions } from '/opt/utils';
