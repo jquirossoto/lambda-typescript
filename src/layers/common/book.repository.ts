@@ -7,7 +7,7 @@ import Book from './definitions/book.interface';
 const TABLE_NAME = 'Books';
 
 export default class BookRepository {
-    dynamodb: DocumentClient;
+    private dynamodb: DocumentClient;
 
     constructor() {
         this.dynamodb = new AWS.DynamoDB.DocumentClient({
