@@ -1,8 +1,8 @@
 import APIGatewayResponse from './definitions/api-gateway-response.interface';
-import APIGatewayProxyResult from './definitions/api-gateway-result.interface';
+import APIGatewayResult from './definitions/api-gateway-result.interface';
 
-export const buildSuccessResponse = (result: any, statusCode: number = 200): APIGatewayProxyResult<any> => {
-    const response: APIGatewayProxyResult<APIGatewayResponse<any>> = {
+export const buildSuccessResponse = (result: any, statusCode: number = 200): APIGatewayResult<any> => {
+    const response: APIGatewayResult<APIGatewayResponse<any>> = {
         statusCode: statusCode,
         body: {
             status: 'SUCCESS',
@@ -12,8 +12,8 @@ export const buildSuccessResponse = (result: any, statusCode: number = 200): API
     return response;
 };
 
-export const buildErrorResponse = (errors: string[], statusCode: number = 500): APIGatewayProxyResult<any> => {
-    const response: APIGatewayProxyResult<APIGatewayResponse<any>> = {
+export const buildErrorResponse = (errors: string[], statusCode: number = 500): APIGatewayResult<any> => {
+    const response: APIGatewayResult<APIGatewayResponse<any>> = {
         statusCode: statusCode,
         body: {
             status: 'ERROR',

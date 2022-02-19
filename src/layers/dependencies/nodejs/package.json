@@ -12,6 +12,7 @@
         "@middy/http-json-body-parser": "^2.5.7",
         "@middy/http-response-serializer": "^2.5.7",
         "aws-sdk": "^2.1073.0",
+        "http-errors": "^2.0.0",
         "uuid": "^8.3.2",
         "winston": "^3.6.0"
     }

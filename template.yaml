@@ -12,6 +12,9 @@ Globals:
     Function:
         Runtime: nodejs14.x
         Timeout: 30
+        Environment:
+            Variables:
+                NODE_ENV:
 
 ################################### APPLICATION RESOURCES ###################################
 

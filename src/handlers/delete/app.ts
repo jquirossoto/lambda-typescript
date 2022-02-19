@@ -7,13 +7,13 @@ import { Handler } from 'aws-lambda';
 
 import BookRepository from '/opt/book.repository';
 import APIGatewayEvent from '/opt/definitions/api-gateway-event.alias';
-import APIGatewayProxyResult from '/opt/definitions/api-gateway-result.interface';
+import APIGatewayResult from '/opt/definitions/api-gateway-result.interface';
 import Book from '/opt/definitions/book.interface';
 import Errors from '/opt/definitions/errors.enum';
 import { buildSuccessResponse, httpResponseSerializerOptions } from '/opt/utils';
 
-export const handler: Handler<APIGatewayEvent, APIGatewayProxyResult<Book>> = middy(
-    async (event: APIGatewayEvent): Promise<APIGatewayProxyResult<Book>> => {
+export const handler: Handler<APIGatewayEvent, APIGatewayResult<Book>> = middy(
+    async (event: APIGatewayEvent): Promise<APIGatewayResult<Book>> => {
         const repo = new BookRepository();
         await repo.delete(event.pathParameters.id);
         return buildSuccessResponse(null);

@@ -1,5 +1,6 @@
 import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import createHttpError from 'http-errors';
 import { v4 as uuid } from 'uuid';
 
 import Book from './definitions/book.interface';
@@ -11,7 +12,7 @@ export default class BookRepository {
 
     constructor() {
         this.dynamodb = new AWS.DynamoDB.DocumentClient({
-            endpoint: new AWS.Endpoint('http://dynamodb:8000'),
+            endpoint: process.env.NODE_ENV === 'local' ? new AWS.Endpoint('http://dynamodb:8000') : undefined,
             region: 'us-east-1'
         });
     }
@@ -107,7 +108,11 @@ export default class BookRepository {
     };
 
     update = (id: string, book: Book): Promise<Book> => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            let foundBook = await this.findOne(id);
+            if (!foundBook) {
+                throw new createHttpError[403]('some error');
+            }
             const params: DocumentClient.UpdateItemInput = {
                 TableName: TABLE_NAME,
                 Key: { bookId: id },
