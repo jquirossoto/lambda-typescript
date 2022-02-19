@@ -1,4 +1,4 @@
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayEvent as AWSAPIGatewayEvent, APIGatewayProxyResult as AWSAPIGatewayProxyResult } from 'aws-lambda';
 
 export interface Book {
     id?: string;
@@ -7,7 +7,7 @@ export interface Book {
     author: string;
 }
 
-export type CustomAPIGatewayEvent<T> = APIGatewayEvent & {
+export type APIGatewayEvent<T> = AWSAPIGatewayEvent & {
     body: T;
 };
 
@@ -16,7 +16,7 @@ export interface APIGatewayResponse<T> {
     result: T;
 }
 
-export interface CustomAPIGatewayProxyResult<T> extends Omit<APIGatewayProxyResult, 'body'> {
+export interface APIGatewayProxyResult<T> extends Omit<AWSAPIGatewayProxyResult, 'body'> {
     body: T;
 }
 

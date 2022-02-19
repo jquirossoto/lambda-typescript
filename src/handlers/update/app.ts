@@ -7,14 +7,12 @@ import { Callback, Context, Handler } from 'aws-lambda';
 
 import BookRepository from '/opt/repositories/book.repository';
 import { buildSuccessReponse } from '/opt/utils/api.utils';
-import { Book, CustomAPIGatewayEvent, Errors } from '/opt/utils/definitions';
+import { Book, APIGatewayEvent, Errors } from '/opt/utils/definitions';
 
-export const handler: Handler = middy(
-    async (event: CustomAPIGatewayEvent<Book>, context: Context, callback: Callback) => {
-        const book: Book = await BookRepository.update(event.pathParameters.id, event.body);
-        return buildSuccessReponse(book);
-    }
-).use([
+export const handler: Handler = middy(async (event: APIGatewayEvent<Book>, context: Context, callback: Callback) => {
+    const book: Book = await BookRepository.update(event.pathParameters.id, event.body);
+    return buildSuccessReponse(book);
+}).use([
     doNotWaitForEmptyEventLoop(),
     httpJsonBodyParser(),
     httpErrorHandler({ fallbackMessage: Errors.GENERAL_ERROR }),
