@@ -1,4 +1,5 @@
 export default interface APIGatewayResponse<T> {
     status: string;
-    result: T;
+    result?: T;
+    errors?: string[];
 }
