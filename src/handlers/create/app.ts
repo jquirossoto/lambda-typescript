@@ -10,13 +10,13 @@ import APIGatewayEvent from '/opt/definitions/api-gateway-event.alias';
 import APIGatewayProxyResult from '/opt/definitions/api-gateway-proxy-result.interface';
 import Book from '/opt/definitions/book.interface';
 import Errors from '/opt/definitions/errors.enum';
-import { buildSuccessReponse, httpResponseSerializerOptions } from '/opt/utils';
+import { buildSuccessResponse, httpResponseSerializerOptions } from '/opt/utils';
 
 export const handler: Handler<APIGatewayEvent<Book>, APIGatewayProxyResult<Book>> = middy(
     async (event: APIGatewayEvent<Book>): Promise<APIGatewayProxyResult<Book>> => {
         const repo = new BookRepository();
         const book: Book = await repo.create(event.body);
-        return buildSuccessReponse(book);
+        return buildSuccessResponse(book);
     }
 ).use([
     doNotWaitForEmptyEventLoop(),
