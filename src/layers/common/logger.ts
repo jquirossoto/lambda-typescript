@@ -2,7 +2,6 @@
  * @file Logger
  * @author jquirossoto
  */
-
 import winston, { LoggerOptions, Logger } from 'winston';
 
 let level = 'info';

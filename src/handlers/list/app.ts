@@ -5,12 +5,14 @@ import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpResponseSerializer from '@middy/http-response-serializer';
 import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
 
-import BookRepository from '/opt/repositories/book.repository';
-import { buildSuccessReponse } from '/opt/utils/api.utils';
-import { Book, Errors } from '/opt/utils/definitions';
+import BookRepository from '/opt/book.repository';
+import Book from '/opt/definitions/book.interface';
+import Errors from '/opt/definitions/errors.enum';
+import { buildSuccessReponse } from '/opt/utils';
 
 export const handler: Handler = middy(async (event: APIGatewayEvent, context: Context, callback: Callback) => {
-    const books: Book[] = await BookRepository.find();
+    const repo = new BookRepository();
+    const books: Book[] = await repo.find();
     return buildSuccessReponse(books);
 }).use([
     doNotWaitForEmptyEventLoop(),

@@ -1,13 +1,22 @@
+import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { v4 as uuid } from 'uuid';
 
-import { Book } from '../utils/definitions';
-import BaseRepository from './base.repository';
+import Book from './definitions/book.interface';
 
 const TABLE_NAME = 'Books';
 
-export default class BookRepository extends BaseRepository<Book> {
-    static create = (book: Book): Promise<Book> => {
+export default class BookRepository {
+    dynamodb: DocumentClient;
+
+    constructor() {
+        this.dynamodb = new AWS.DynamoDB.DocumentClient({
+            endpoint: new AWS.Endpoint('http://dynamodb:8000'),
+            region: 'us-east-1'
+        });
+    }
+
+    create = (book: Book): Promise<Book> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.UpdateItemInput = {
                 TableName: TABLE_NAME,
@@ -38,7 +47,7 @@ export default class BookRepository extends BaseRepository<Book> {
         });
     };
 
-    static findOne = (id: string): Promise<Book> => {
+    findOne = (id: string): Promise<Book> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.GetItemInput = {
                 Key: {
@@ -67,7 +76,7 @@ export default class BookRepository extends BaseRepository<Book> {
         });
     };
 
-    static find = (): Promise<Book[]> => {
+    find = (): Promise<Book[]> => {
         return new Promise(async (resolve, reject) => {
             try {
                 const params: DocumentClient.ScanInput = {
@@ -97,7 +106,7 @@ export default class BookRepository extends BaseRepository<Book> {
         });
     };
 
-    static update = (id: string, book: Book): Promise<Book> => {
+    update = (id: string, book: Book): Promise<Book> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.UpdateItemInput = {
                 TableName: TABLE_NAME,
@@ -128,7 +137,7 @@ export default class BookRepository extends BaseRepository<Book> {
         });
     };
 
-    static delete = (id: string): Promise<null> => {
+    delete = (id: string): Promise<null> => {
         return new Promise((resolve, reject) => {
             const params: DocumentClient.DeleteItemInput = {
                 TableName: TABLE_NAME,
