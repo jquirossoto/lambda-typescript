@@ -42,12 +42,10 @@ export const dynamoDBErrorHandler = (error: AWS.AWSError): HttpError => {
     let result: HttpError;
     if (error.statusCode < 500) {
         switch (error.code) {
-            case 'ResourceNotFoundException':
-                result = new NotFound(Errors.NOT_FOUND);
-                break;
             case 'ValidationException':
                 result = new UnprocessableEntity(Errors.UNPROCESSABLE);
                 break;
+            case 'ResourceNotFoundException':
             case 'ConditionalCheckFailedException':
             case 'AccessDeniedException':
             case 'IncompleteSignatureException':
