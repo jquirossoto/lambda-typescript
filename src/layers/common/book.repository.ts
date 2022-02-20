@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import * as httpErrors from 'http-errors';
+import { NotFound, HttpError } from 'http-errors';
 import { v4 as uuid } from 'uuid';
 
 import Book from './definitions/book.interface';
@@ -47,8 +47,8 @@ export default class BookRepository {
                     };
                     resolve(createdBook);
                 })
-                .catch((error: AWS.AWSError) => {
-                    reject(error);
+                .catch((err: AWS.AWSError) => {
+                    reject(dynamoDBErrorHandler(err));
                 });
         });
     };
@@ -74,12 +74,11 @@ export default class BookRepository {
                         };
                         resolve(book);
                     } else {
-                        reject(new httpErrors.NotFound(Errors.NOT_FOUND));
+                        reject(new NotFound(Errors.NOT_FOUND));
                     }
                 })
                 .catch((err: AWS.AWSError) => {
-                    const error: Error = dynamoDBErrorHandler(err);
-                    reject(error);
+                    reject(dynamoDBErrorHandler(err));
                 });
         });
     };
@@ -109,8 +108,7 @@ export default class BookRepository {
                 });
                 resolve(books);
             } catch (err) {
-                let error: Error = dynamoDBErrorHandler(err);
-                reject(error);
+                reject(dynamoDBErrorHandler(err));
             }
         });
     };
@@ -140,8 +138,8 @@ export default class BookRepository {
                     };
                     resolve(updatedBook);
                 })
-                .catch((error: AWS.AWSError) => {
-                    reject(error);
+                .catch((err: AWS.AWSError) => {
+                    reject(dynamoDBErrorHandler(err));
                 });
         });
     };
@@ -158,8 +156,8 @@ export default class BookRepository {
                 .then(() => {
                     resolve(null);
                 })
-                .catch((error: AWS.AWSError) => {
-                    reject(error);
+                .catch((err: AWS.AWSError) => {
+                    reject(dynamoDBErrorHandler(err));
                 });
         });
     };
