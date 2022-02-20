@@ -1,9 +1,11 @@
 import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import createHttpError from 'http-errors';
+import * as httpErrors from 'http-errors';
 import { v4 as uuid } from 'uuid';
 
 import Book from './definitions/book.interface';
+import Errors from './definitions/errors.enum';
+import { dynamoDBErrorHandler } from './utils';
 
 const TABLE_NAME = 'Books';
 
@@ -13,7 +15,10 @@ export default class BookRepository {
     constructor() {
         this.dynamodb = new AWS.DynamoDB.DocumentClient({
             endpoint: process.env.NODE_ENV === 'local' ? new AWS.Endpoint('http://dynamodb:8000') : undefined,
-            region: 'us-east-1'
+            region: 'us-east-1',
+            httpOptions: {
+                timeout: 20000
+            }
         });
     }
 
@@ -42,7 +47,7 @@ export default class BookRepository {
                     };
                     resolve(createdBook);
                 })
-                .catch((error) => {
+                .catch((error: AWS.AWSError) => {
                     reject(error);
                 });
         });
@@ -60,18 +65,20 @@ export default class BookRepository {
                 .get(params)
                 .promise()
                 .then((data: DocumentClient.GetItemOutput) => {
-                    let book: Book = null;
                     if (data.Item) {
-                        book = {
+                        const book: Book = {
                             id: data.Item.bookId,
                             title: data.Item.title,
                             genre: data.Item.genre,
                             author: data.Item.author
                         };
+                        resolve(book);
+                    } else {
+                        reject(new httpErrors.NotFound(Errors.NOT_FOUND));
                     }
-                    resolve(book);
                 })
-                .catch((error) => {
+                .catch((err: AWS.AWSError) => {
+                    const error: Error = dynamoDBErrorHandler(err);
                     reject(error);
                 });
         });
@@ -101,7 +108,8 @@ export default class BookRepository {
                     return book;
                 });
                 resolve(books);
-            } catch (error) {
+            } catch (err) {
+                let error: Error = dynamoDBErrorHandler(err);
                 reject(error);
             }
         });
@@ -109,10 +117,6 @@ export default class BookRepository {
 
     update = (id: string, book: Book): Promise<Book> => {
         return new Promise(async (resolve, reject) => {
-            let foundBook = await this.findOne(id);
-            if (!foundBook) {
-                throw new createHttpError[403]('some error');
-            }
             const params: DocumentClient.UpdateItemInput = {
                 TableName: TABLE_NAME,
                 Key: { bookId: id },
@@ -136,7 +140,7 @@ export default class BookRepository {
                     };
                     resolve(updatedBook);
                 })
-                .catch((error) => {
+                .catch((error: AWS.AWSError) => {
                     reject(error);
                 });
         });
@@ -154,7 +158,7 @@ export default class BookRepository {
                 .then(() => {
                     resolve(null);
                 })
-                .catch((error) => {
+                .catch((error: AWS.AWSError) => {
                     reject(error);
                 });
         });
