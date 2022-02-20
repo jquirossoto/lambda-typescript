@@ -1,6 +1,5 @@
 import middy from '@middy/core';
 import doNotWaitForEmptyEventLoop from '@middy/do-not-wait-for-empty-event-loop';
-import httpErrorHandler from '@middy/http-error-handler';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpResponseSerializer from '@middy/http-response-serializer';
 import { Handler } from 'aws-lambda';
@@ -10,6 +9,7 @@ import APIGatewayEvent from '/opt/definitions/api-gateway-event.alias';
 import APIGatewayResult from '/opt/definitions/api-gateway-result.interface';
 import Book from '/opt/definitions/book.interface';
 import Errors from '/opt/definitions/errors.enum';
+import httpErrorHandler from '/opt/http-error-handler.middleware';
 import { buildSuccessResponse, httpResponseSerializerOptions } from '/opt/utils';
 
 export const handler: Handler<APIGatewayEvent<Book>, APIGatewayResult<Book>> = middy(
