@@ -150,7 +150,12 @@ export default class BookRepository {
     };
 
     delete = (id: string): Promise<null> => {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.findOne(id);
+            } catch (err) {
+                return reject(err);
+            }
             const params: DocumentClient.DeleteItemInput = {
                 TableName: TABLE_NAME,
                 Key: { bookId: id }
