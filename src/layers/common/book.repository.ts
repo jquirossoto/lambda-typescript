@@ -1,6 +1,6 @@
 import AWS from 'aws-sdk';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { NotFound, HttpError } from 'http-errors';
+import { NotFound } from 'http-errors';
 import { v4 as uuid } from 'uuid';
 
 import Book from './definitions/book.interface';
