@@ -1,4 +1,4 @@
-import { NotFound, UnprocessableEntity, InternalServerError, HttpError } from 'http-errors';
+import { UnprocessableEntity, InternalServerError, HttpError } from 'http-errors';
 
 import APIGatewayResponse from './definitions/api-gateway-response.interface';
 import APIGatewayResult from './definitions/api-gateway-result.interface';
@@ -37,6 +37,7 @@ export const httpResponseSerializerOptions = {
     default: 'application/json'
 };
 
+// based on https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Programming.Errors.html
 export const dynamoDBErrorHandler = (error: AWS.AWSError): HttpError => {
     logger.error(error);
     let result: HttpError;
