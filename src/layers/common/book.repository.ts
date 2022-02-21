@@ -115,9 +115,11 @@ export default class BookRepository {
 
     update = (id: string, book: Book): Promise<Book> => {
         return new Promise(async (resolve, reject) => {
-            await this.findOne(id).catch((err) => {
-                reject(err);
-            });
+            try {
+                await this.findOne(id);
+            } catch (err) {
+                return reject(err);
+            }
             const params: DocumentClient.UpdateItemInput = {
                 TableName: TABLE_NAME,
                 Key: { bookId: id },
