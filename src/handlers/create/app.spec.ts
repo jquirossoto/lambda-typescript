@@ -10,7 +10,6 @@ import Book from '/opt/definitions/book.interface';
 import { handler } from './app';
 
 jest.mock('/opt/book.repository');
-
 const mockedRepo = jest.mocked(repo, true);
 
 describe('Create', () => {
