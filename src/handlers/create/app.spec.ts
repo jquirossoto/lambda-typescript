@@ -8,6 +8,7 @@ import APIGatewayResponse from '/opt/definitions/api-gateway-response.interface'
 import APIGatewayResult from '/opt/definitions/api-gateway-result.interface';
 import Book from '/opt/definitions/book.interface';
 import Errors from '/opt/definitions/errors.enum';
+import Statuses from '/opt/definitions/status.enum';
 
 import { handler } from './app';
 
@@ -36,7 +37,7 @@ describe('Create', () => {
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(result.statusCode).toBe(200);
-            expect(response.status).toBe('SUCCESS');
+            expect(response.status).toBe(Statuses.SUCCESS);
             expect(response.result).toEqual(createdBook);
         });
 
@@ -56,7 +57,7 @@ describe('Create', () => {
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(result.statusCode).toBe(422);
-            expect(response.status).toBe('ERROR');
+            expect(response.status).toBe(Statuses.ERROR);
             expect(response.result).toBe(Errors.UNPROCESSABLE);
         });
 
@@ -76,7 +77,7 @@ describe('Create', () => {
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(result.statusCode).toBe(500);
-            expect(response.status).toBe('ERROR');
+            expect(response.status).toBe(Statuses.ERROR);
             expect(response.result).toBe(Errors.GENERAL_ERROR);
         });
     });
