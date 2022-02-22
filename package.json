@@ -5,7 +5,7 @@
     "main": "app.js",
     "scripts": {
         "prepare": "husky install",
-        "postinstall": "cd src/layers/dependencies/nodejs && npm ci",
+        "postinstall": "cd src/layers/dependencies/nodejs && npm install",
         "prestart": "npm run build",
         "start": "sam local start-api --env-vars env/local.env.json --docker-network books-service_book-service-network",
         "start:watch": "nodemon --watch \"dist/**\" --exec \"sam local start-api --env-vars env/local.env.json --docker-network books-service_book-service-network\"",
