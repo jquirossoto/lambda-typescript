@@ -3,7 +3,7 @@ import { UnprocessableEntity, InternalServerError, HttpError } from 'http-errors
 import APIGatewayResponse from './definitions/api-gateway-response.interface';
 import APIGatewayResult from './definitions/api-gateway-result.interface';
 import Errors from './definitions/errors.enum';
-import Statuses from './definitions/status.enum';
+import Statuses from './definitions/statuses.enum';
 import logger from './logger';
 
 export const buildSuccessResponse = (result: any, statusCode: number = 200): APIGatewayResult<any> => {

@@ -8,8 +8,8 @@ import APIGatewayResponse from '/opt/definitions/api-gateway-response.interface'
 import APIGatewayResult from '/opt/definitions/api-gateway-result.interface';
 import Book from '/opt/definitions/book.interface';
 import Errors from '/opt/definitions/errors.enum';
-import Statuses from '/opt/definitions/status.enum';
 
+import Statuses from '../../layers/common/definitions/statuses.enum';
 import { handler } from './app';
 
 jest.mock('/opt/book.repository');
