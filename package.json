@@ -16,6 +16,7 @@
         "build:clean": "rm -rf dist",
         "pretest": "npm run test:clean",
         "test": "jest --coverage",
+        "test:watch": "jest --watch",
         "test:clean": "rm -rf jest",
         "docker:up": "docker-compose up -d",
         "docker:down": "docker-compose kill",

@@ -1,5 +1,5 @@
 import { Context } from 'aws-lambda';
-import { UnprocessableEntity } from 'http-errors';
+import { NotFound } from 'http-errors';
 import { v4 as uuid } from 'uuid';
 
 import * as repo from '/opt/book.repository';
@@ -15,70 +15,60 @@ import { handler } from './app';
 jest.mock('/opt/book.repository');
 const mockedRepo = jest.mocked(repo, true);
 
-describe('Create', () => {
+describe('Delete', () => {
     describe('Handler', () => {
-        it('Should return 200 with a created book.', async () => {
-            const newBook: Book = {
-                title: 'New book',
-                genre: 'Fiction',
-                author: 'John Doe'
-            };
-            const createdBook: Book = {
-                id: uuid(),
-                ...newBook
-            };
+        it('Should return 200 with a success status', async () => {
+            const id: string = uuid();
             const event: APIGatewayEvent<Book> = {
-                body: newBook
+                pathParameters: {
+                    id: id
+                }
             } as any;
             const context: Context = {} as any;
-            mockedRepo.create.mockResolvedValue(createdBook);
+            mockedRepo.remove.mockResolvedValue(null);
 
             const result = (await handler(event, context, null)) as APIGatewayResult;
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
-            expect(mockedRepo.create).toHaveBeenCalledWith(newBook);
+            expect(mockedRepo.remove).toHaveBeenCalledWith(id);
             expect(result.statusCode).toBe(200);
             expect(response.status).toBe(Statuses.SUCCESS);
-            expect(response.result).toEqual(createdBook);
+            expect(response.result).toEqual(null);
         });
 
-        it('Should return 422 error with an error message', async () => {
-            const newBook: Book = {
-                title: 'New book',
-                genre: 'Fiction',
-                author: 'John Doe'
-            };
+        it('Should return 404 error with an error message', async () => {
+            const id: string = uuid();
             const event: APIGatewayEvent<Book> = {
-                body: newBook
+                pathParameters: {
+                    id: id
+                }
             } as any;
             const context: Context = {} as any;
-            mockedRepo.create.mockRejectedValue(new UnprocessableEntity(Errors.UNPROCESSABLE));
+            mockedRepo.remove.mockRejectedValue(new NotFound(Errors.NOT_FOUND));
 
             const result = (await handler(event, context, null)) as APIGatewayResult;
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
-            expect(mockedRepo.create).toHaveBeenCalledWith(newBook);
-            expect(result.statusCode).toBe(422);
+            expect(mockedRepo.remove).toHaveBeenCalledWith(id);
+            expect(result.statusCode).toBe(404);
             expect(response.status).toBe(Statuses.ERROR);
-            expect(response.result).toBe(Errors.UNPROCESSABLE);
+            expect(response.result).toBe(Errors.NOT_FOUND);
         });
 
         it('Should return default 500 error with an error message', async () => {
-            const newBook: Book = {
-                title: 'New book',
-                genre: 'Fiction',
-                author: 'John Doe'
-            };
+            const id: string = uuid();
             const event: APIGatewayEvent<Book> = {
-                body: newBook
+                pathParameters: {
+                    id: id
+                }
             } as any;
             const context: Context = {} as any;
-            mockedRepo.create.mockRejectedValue(new Error());
+            mockedRepo.remove.mockRejectedValue(new Error());
 
             const result = (await handler(event, context, null)) as APIGatewayResult;
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
-            expect(mockedRepo.create).toHaveBeenCalledWith(newBook);
+            expect(mockedRepo.remove).toHaveBeenCalledWith(id);
             expect(result.statusCode).toBe(500);
             expect(response.status).toBe(Statuses.ERROR);
             expect(response.result).toBe(Errors.GENERAL_ERROR);
