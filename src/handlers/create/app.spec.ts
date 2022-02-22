@@ -15,6 +15,7 @@ const mockedRepo = jest.mocked(repo, true);
 describe('Create', () => {
     describe('Handler', () => {
         it('Should return 200 with a created book.', async () => {
+            debugger;
             const newBook: Book = {
                 title: 'New book',
                 genre: 'Fiction',
@@ -30,13 +31,11 @@ describe('Create', () => {
             const context: Context = {} as any;
             mockedRepo.create.mockResolvedValue(createdBook);
 
-            const result = (await handler(event, context, null)) as APIGatewayResult<Book>;
+            const result = (await handler(event, context, null)) as APIGatewayResult;
+            const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
 
-            const body: APIGatewayResponse<Book> = JSON.parse(
-                result.body as unknown as string
-            ) as APIGatewayResponse<Book>;
             expect(result.statusCode).toBe(200);
-            expect(body.result).toEqual(createdBook);
+            expect(response.result).toEqual(createdBook);
         });
     });
 });
