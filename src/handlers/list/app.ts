@@ -12,7 +12,7 @@ import Errors from '/opt/definitions/errors.enum';
 import httpErrorHandler from '/opt/http-error-handler.middleware';
 import { buildSuccessResponse, httpResponseSerializerOptions } from '/opt/utils';
 
-export const handler: Handler<APIGatewayEvent, APIGatewayResult<Book>> = middy(
+export const handler: Handler<APIGatewayEvent> = middy(
     async (event: APIGatewayEvent): Promise<APIGatewayResult<Book>> => {
         const books: Book[] = await find();
         return buildSuccessResponse(books);
