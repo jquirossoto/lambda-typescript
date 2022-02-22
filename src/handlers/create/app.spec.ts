@@ -33,8 +33,8 @@ describe('Create', () => {
             mockedRepo.create.mockResolvedValue(createdBook);
 
             const result = (await handler(event, context, null)) as APIGatewayResult;
-            const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
 
+            const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(result.statusCode).toBe(200);
             expect(response.status).toBe('SUCCESS');
             expect(response.result).toEqual(createdBook);
@@ -60,7 +60,7 @@ describe('Create', () => {
             expect(response.result).toBe(Errors.UNPROCESSABLE);
         });
 
-        it.only('Should return default 500 error with an error message', async () => {
+        it('Should return default 500 error with an error message', async () => {
             const newBook: Book = {
                 title: 'New book',
                 genre: 'Fiction',
