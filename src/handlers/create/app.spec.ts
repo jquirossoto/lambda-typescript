@@ -13,12 +13,6 @@ jest.mock('/opt/book.repository');
 
 const mockedRepo = jest.mocked(repo, true);
 
-// const MockedBookRepository = BookRepository as jest.Mocked<typeof BookRepository>;
-// const mockBookRepository = new MockedBookRepository() as jest.Mocked<BookRepository>;
-
-// const MockedBookRepository = <jest.Mock<BookRepository>>BookRepository;
-//             const mockedBookRepository = <jest.Mocked<BookRepository>> new MockedBookRepository();
-
 describe('Create', () => {
     describe('Handler', () => {
         it('Should return 200 with a created book.', async () => {
