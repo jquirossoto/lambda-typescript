@@ -33,7 +33,7 @@ describe('Get', () => {
             const context: Context = {} as any;
             mockedRepo.findOne.mockResolvedValue(foundBook);
 
-            const result = (await handler(event, context, null)) as unknown as APIGatewayResult;
+            const result = (await handler(event, context, null)) as APIGatewayResult;
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(mockedRepo.findOne).toHaveBeenCalledWith(id);
@@ -52,7 +52,7 @@ describe('Get', () => {
             const context: Context = {} as any;
             mockedRepo.findOne.mockRejectedValue(new NotFound(Errors.NOT_FOUND));
 
-            const result = (await handler(event, context, null)) as unknown as APIGatewayResult;
+            const result = (await handler(event, context, null)) as APIGatewayResult;
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(mockedRepo.findOne).toHaveBeenCalledWith(id);
@@ -71,7 +71,7 @@ describe('Get', () => {
             const context: Context = {} as any;
             mockedRepo.findOne.mockRejectedValue(new Error());
 
-            const result = (await handler(event, context, null)) as unknown as APIGatewayResult;
+            const result = (await handler(event, context, null)) as APIGatewayResult;
 
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
             expect(mockedRepo.findOne).toHaveBeenCalledWith(id);
