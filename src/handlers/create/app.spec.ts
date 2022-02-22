@@ -1,4 +1,5 @@
 import { Context } from 'aws-lambda';
+import { UnprocessableEntity } from 'http-errors';
 import { v4 as uuid } from 'uuid';
 
 import * as repo from '/opt/book.repository';
@@ -6,6 +7,7 @@ import APIGatewayEvent from '/opt/definitions/api-gateway-event.alias';
 import APIGatewayResponse from '/opt/definitions/api-gateway-response.interface';
 import APIGatewayResult from '/opt/definitions/api-gateway-result.interface';
 import Book from '/opt/definitions/book.interface';
+import Errors from '/opt/definitions/errors.enum';
 
 import { handler } from './app';
 
@@ -15,7 +17,6 @@ const mockedRepo = jest.mocked(repo, true);
 describe('Create', () => {
     describe('Handler', () => {
         it('Should return 200 with a created book.', async () => {
-            debugger;
             const newBook: Book = {
                 title: 'New book',
                 genre: 'Fiction',
@@ -35,7 +36,48 @@ describe('Create', () => {
             const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
 
             expect(result.statusCode).toBe(200);
+            expect(response.status).toBe('SUCCESS');
             expect(response.result).toEqual(createdBook);
+        });
+
+        it('Should return 422 error with an error message', async () => {
+            const newBook: Book = {
+                title: 'New book',
+                genre: 'Fiction',
+                author: 'John Doe'
+            };
+            const event: APIGatewayEvent<Book> = {
+                body: newBook
+            } as any;
+            const context: Context = {} as any;
+            mockedRepo.create.mockRejectedValue(new UnprocessableEntity(Errors.UNPROCESSABLE));
+
+            const result = (await handler(event, context, null)) as APIGatewayResult;
+
+            const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
+            expect(result.statusCode).toBe(422);
+            expect(response.status).toBe('ERROR');
+            expect(response.result).toBe(Errors.UNPROCESSABLE);
+        });
+
+        it.only('Should return default 500 error with an error message', async () => {
+            const newBook: Book = {
+                title: 'New book',
+                genre: 'Fiction',
+                author: 'John Doe'
+            };
+            const event: APIGatewayEvent<Book> = {
+                body: newBook
+            } as any;
+            const context: Context = {} as any;
+            mockedRepo.create.mockRejectedValue(new Error());
+
+            const result = (await handler(event, context, null)) as APIGatewayResult;
+
+            const response: APIGatewayResponse<Book> = JSON.parse(result.body as unknown as string);
+            expect(result.statusCode).toBe(500);
+            expect(response.status).toBe('ERROR');
+            expect(response.result).toBe(Errors.GENERAL_ERROR);
         });
     });
 });
