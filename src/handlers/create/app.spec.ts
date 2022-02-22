@@ -17,7 +17,7 @@ describe('Create', () => {
     describe('Handler', () => {
         it('Should return 200 with a created book.', async () => {
             const newBook: Book = {
-                title: 'My book',
+                title: 'New book',
                 genre: 'Fiction',
                 author: 'John Doe'
             };
