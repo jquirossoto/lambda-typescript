@@ -7,7 +7,7 @@ import Book from './definitions/book.interface';
 import Errors from './definitions/errors.enum';
 import { dynamoDBErrorHandler } from './utils';
 
-const dynamodb = new AWS.DynamoDB.DocumentClient({
+const dynamodb: DocumentClient = new AWS.DynamoDB.DocumentClient({
     endpoint: process.env.NODE_ENV === 'local' ? new AWS.Endpoint('http://dynamodb:8000') : undefined,
     region: 'us-east-1',
     httpOptions: {
