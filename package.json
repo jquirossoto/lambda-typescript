@@ -27,6 +27,7 @@
     "author": "jquirossoto",
     "license": "ISC",
     "devDependencies": {
+        "@jurijzahn8019/aws-promise-jest-mock": "^2.4.34",
         "@trivago/prettier-plugin-sort-imports": "^3.2.0",
         "@types/aws-lambda": "^8.10.92",
         "@types/http-errors": "^1.8.2",
